@@ -78,16 +78,12 @@ const COP = () => {
       config_msg
     );
 
-    console.log(config_tx);
-
     setData(config_tx);
 
     const borrow_balance = await client_here.queryContractSmart(
       protocol_address,
       borrow_msg
     );
-
-    console.log(borrow_balance);
 
     setBorrowBalance(borrow_balance?.total_debt / 1000000);
     setCollateralBalance(borrow_balance?.collateral_deposited / 1000000);
