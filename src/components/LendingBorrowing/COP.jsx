@@ -13,14 +13,13 @@ import { om_token } from "../../assets";
 const COP = () => {
   const [manage, setManage] = useState(false);
   const [manageAmount, setManageAmount] = useState("0");
-  const [arrowClicked, setArrowClicked] = useState(true);
-  const [supplyBalance, setSupplyBalance] = useState(0);
   const [borrowBalance, setBorrowBalance] = useState(0);
+  const [collateralBalance, setCollateralBalance] = useState(0);
   const [text, setText] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [client, setClient] = useState(null);
-  const { getOfflineSigner, address, getRpcEndpoint, isWalletConnected } =
+  const { getOfflineSigner, address, isWalletConnected } =
     useChain("mantrachaintestnet");
 
   const rpc = "https://mantra-testnet-rpc.publicnode.com";
@@ -38,9 +37,39 @@ const COP = () => {
     setClient(client_here);
   };
 
+  const fetch_balance = async () => {
+    const offlineSigner = getOfflineSigner();
+    const client_here = await SigningCosmWasmClient.connectWithSigner(
+      rpc,
+      offlineSigner,
+      {
+        gasPrice: GasPrice.fromString("0.025uom"),
+      }
+    );
+    const borrow_msg = {
+      info: {
+        user: address,
+      },
+    };
+    const borrow_balance = await client_here.queryContractSmart(
+      protocol_address,
+      borrow_msg
+    );
+    console.log(borrow_balance);
+    setBorrowBalance(borrow_balance?.total_debt / 1000000);
+
+    console.log(borrow_balance?.total_debt);
+
+    setCollateralBalance(borrow_balance?.collateral_deposited / 1000000);
+  };
+
+  useEffect(() => {
+    fetch_balance();
+  }, [address, isLoading]);
+
   useEffect(() => {
     client_data();
-  });
+  }, [address, isLoading]);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -69,10 +98,10 @@ const COP = () => {
   };
 
   const token_address =
-    "mantra1da46lmu9uxd5dwm8lqmhwm8mahuydzysva2y9sw0nqff8rnnupfs8th4l2";
+    "mantra179mvyhjvckcg6a5r7f8ttasdmlydspfmugm9rzh82zwkvacyzr2q3ea44j";
 
   const protocol_address =
-    "mantra1kh4hz9hd6m0jzvsdlvx94q44x57vvveppx0f4p7sudrq87499y3swv08mn";
+    "mantra1ry28qu3dagp45aq8rrzrz3n8wdjz067x5srt66ww26s7djtq70hqpdghr0";
 
   const parseMantra = (value) => {
     let number = parseFloat(value);
@@ -90,15 +119,15 @@ const COP = () => {
         },
       };
 
-      const funds = [coin(1, "uom")];
+      // const funds = [coin(1, "uom")];
 
       const borrow = await client.execute(
         address,
         protocol_address,
         borrow_msg,
         "auto",
-        "",
-        funds
+        ""
+        // funds
       );
 
       console.log(borrow);
@@ -158,11 +187,7 @@ const COP = () => {
         <div className="flex h-full w-[20%]">
           <div>
             <h1 className="text-purple-500 font-semibold text-lg">Balance</h1>
-            <p className="text-4xl font-bold">
-              {arrowClicked
-                ? `$ ${parseInt(supplyBalance)?.toFixed(3)}`
-                : `$ ${parseInt(borrowBalance)?.toFixed(3)}`}
-            </p>
+            <p className="text-4xl font-bold">$ {borrowBalance.toFixed(3)}</p>
           </div>
         </div>
         {!isWalletConnected ? (
@@ -201,16 +226,21 @@ const COP = () => {
 
           <div className="mx-[20px] flex flex-row justify-between mt-10">
             <div className="h-[50px] flex flex-col justify-center gap-y-[10px]">
-              <div className="flex gap-3">
-                <img src={om_token} className="w-6" />
-                <h1 className="text-lg font-semibold text-center">OM</h1>
+              <div className="flex-col">
+                <div className="flex gap-3">
+                  <img src={om_token} className="w-6" />
+                  <h1 className="text-xl font-semibold text-center">OM</h1>
+                </div>
+                <span className="text-sm font-medium text-gray-400">
+                  {collateralBalance.toFixed(5)}
+                </span>
               </div>
             </div>
 
             <div className="flex flex-row gap-x-[15px] h-[50px] justify-between items-center">
               <button
                 onClick={openModal}
-                className="h-14 w-80 px-5 bg-site-black rounded-full text-sm flex justify-center items-center"
+                className="h-14 w-60 px-5 bg-site-black rounded-full text-sm flex justify-center items-center"
               >
                 Manage Collateral
               </button>
@@ -271,7 +301,7 @@ const COP = () => {
                 </div>
               ) : (
                 <p className="text-gray-500 font-semibold text-lg">
-                  $ <span className="text-white">0</span>.000
+                  $ <span className="text-white">0.00</span>
                 </p>
               )}
               <hr className="border-gray-500 border-opacity-30" />

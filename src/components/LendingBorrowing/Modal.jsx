@@ -20,10 +20,38 @@ const Modal = ({ isOpen, onClose }) => {
   const rpc = "https://rpc.hongbai.mantrachain.io";
 
   const token_address =
-    "mantra1da46lmu9uxd5dwm8lqmhwm8mahuydzysva2y9sw0nqff8rnnupfs8th4l2";
+    "mantra179mvyhjvckcg6a5r7f8ttasdmlydspfmugm9rzh82zwkvacyzr2q3ea44j";
 
   const protocol_address =
-    "mantra1kh4hz9hd6m0jzvsdlvx94q44x57vvveppx0f4p7sudrq87499y3swv08mn";
+    "mantra1ry28qu3dagp45aq8rrzrz3n8wdjz067x5srt66ww26s7djtq70hqpdghr0";
+
+  const fetch_balance = async () => {
+    const offlineSigner = getOfflineSigner();
+    const client = await SigningCosmWasmClient.connectWithSigner(
+      rpc,
+      offlineSigner,
+      {
+        gasPrice: GasPrice.fromString("0.025uom"),
+      }
+    );
+    const borrow_msg = {
+      info: {
+        user: address,
+      },
+    };
+    const deposit_balance = await client.getBalance(address, "uom");
+    console.log(deposit_balance);
+    const withdraw_balance = await client.queryContractSmart(
+      protocol_address,
+      borrow_msg
+    );
+    setDepositBalance(deposit_balance?.amount / 1000000);
+    setWithdrawBalance(withdraw_balance?.collateral_deposited / 1000000);
+  };
+
+  useEffect(() => {
+    fetch_balance();
+  }, [address, isLoading]);
 
   const client_data = async () => {
     const offlineSigner = getOfflineSigner();
@@ -39,7 +67,7 @@ const Modal = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     client_data();
-  });
+  }, [address, isLoading]);
 
   const parseMantra = (value) => {
     let number = parseFloat(value);
@@ -148,8 +176,8 @@ const Modal = ({ isOpen, onClose }) => {
           <div className="flex justify-between mb-4">
             <p>
               {activeTab === "stake"
-                ? `Balance: ${depositBalance || "0.00"}`
-                : `Balance: ${withdrawBalance || "0.00"}`}
+                ? `Balance: ${depositBalance.toFixed(2) || "0.00"}`
+                : `Balance: ${withdrawBalance.toFixed(3) || "0.00"}`}
             </p>
           </div>
         </div>
