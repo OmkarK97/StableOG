@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -12,7 +13,6 @@ const Modal = ({ isOpen, onClose }) => {
   const [amount, setAmount] = useState(0);
   const [depositBalance, setDepositBalance] = useState(0);
   const [withdrawBalance, setWithdrawBalance] = useState(0);
-  const [dbData, setDBdata] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [client, setClient] = useState(null);
   const { getOfflineSigner, address } = useChain("mantrachaintestnet");

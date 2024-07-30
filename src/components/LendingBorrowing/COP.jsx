@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-refresh/only-export-components */
 import React, { useEffect, useState } from "react";
 import Modal from "./Modal";
@@ -15,10 +16,12 @@ const COP = () => {
   const [manageAmount, setManageAmount] = useState("0");
   const [borrowBalance, setBorrowBalance] = useState(0);
   const [collateralBalance, setCollateralBalance] = useState(0);
+  const [susdBalance, setsusdBalance] = useState(0);
   const [text, setText] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [client, setClient] = useState(null);
+  const [data, setData] = useState({});
   const { getOfflineSigner, address, isWalletConnected } =
     useChain("mantrachaintestnet");
 
@@ -46,26 +49,53 @@ const COP = () => {
         gasPrice: GasPrice.fromString("0.025uom"),
       }
     );
+
+    const susd_query = {
+      balance: {
+        address: address,
+      },
+    };
+
+    const susd_balance = await client_here.queryContractSmart(
+      token_address,
+      susd_query
+    );
+
+    setsusdBalance(susd_balance?.balance);
+
     const borrow_msg = {
       info: {
         user: address,
       },
     };
+
+    const config_msg = {
+      config: {},
+    };
+
+    const config_tx = await client_here.queryContractSmart(
+      protocol_address,
+      config_msg
+    );
+
+    console.log(config_tx);
+
+    setData(config_tx);
+
     const borrow_balance = await client_here.queryContractSmart(
       protocol_address,
       borrow_msg
     );
+
     console.log(borrow_balance);
+
     setBorrowBalance(borrow_balance?.total_debt / 1000000);
-
-    console.log(borrow_balance?.total_debt);
-
     setCollateralBalance(borrow_balance?.collateral_deposited / 1000000);
   };
 
   useEffect(() => {
     fetch_balance();
-  }, [address, isLoading]);
+  }, [address, isLoading, manageAmount]);
 
   useEffect(() => {
     client_data();
@@ -114,12 +144,10 @@ const COP = () => {
       setIsLoading(true);
 
       const borrow_msg = {
-        deposit_collateral_and_mint: {
+        borrow_tokens: {
           token_amount: parseMantra(manageAmount).toString(),
         },
       };
-
-      // const funds = [coin(1, "uom")];
 
       const borrow = await client.execute(
         address,
@@ -127,7 +155,6 @@ const COP = () => {
         borrow_msg,
         "auto",
         ""
-        // funds
       );
 
       console.log(borrow);
@@ -159,20 +186,19 @@ const COP = () => {
       console.log("allowance response: ", allowanceResponse);
 
       const repay_msg = {
-        redeem_collateral_and_burn: {
-          amount_collateral: "1",
-          amount_token: parseMantra(manageAmount).toString(),
+        repay: {
+          token_amount: parseMantra(manageAmount).toString(),
         },
       };
 
-      const repay = await client.execute(
+      const repay_tx = await client.execute(
         address,
         protocol_address,
         repay_msg,
         "auto"
       );
 
-      console.log(repay);
+      console.log(repay_tx);
       setIsLoading(false);
     } catch (error) {
       console.error(error);
@@ -200,7 +226,7 @@ const COP = () => {
                 onClick={handleManageBorrow}
               >
                 <span className="text-base text-gray-500 font-semibold">
-                  Borrow USDC
+                  Borrow SUSD
                 </span>
               </button>
               <button
@@ -208,7 +234,7 @@ const COP = () => {
                 onClick={handleManageRepay}
               >
                 <span className="text-base text-gray-500 font-semibold">
-                  Repay USDC
+                  Repay SUSD
                 </span>
               </button>
             </div>
@@ -252,7 +278,7 @@ const COP = () => {
           <div className=" h-full w-[450px] bg-site-black bg-opacity-30 rounded-lg p-10 border-2">
             <div className="flex flex-col gap-5">
               <h1 className="text-gray-400 font-bold">
-                {manage ? "Manage Lending & Borrowing" : "USDC Wallet Address"}
+                {manage ? "Manage Borrow & Repay" : "SUSD Wallet Address"}
               </h1>
               {manage ? (
                 <div className="flex w-full justify-between">
@@ -301,7 +327,10 @@ const COP = () => {
                 </div>
               ) : (
                 <p className="text-gray-500 font-semibold text-lg">
-                  $ <span className="text-white">0.00</span>
+                  ${" "}
+                  <span className="text-white">
+                    {(susdBalance / 1000000).toFixed(3)}
+                  </span>
                 </p>
               )}
               <hr className="border-gray-500 border-opacity-30" />
@@ -314,19 +343,40 @@ const COP = () => {
             </h1>
             <div className="flex flex-row mx-[20px] justify-between mt-[20px]">
               <p>Collateral Value</p>
-              <h3>$ 0.00</h3>
+              <h3>
+                ${" "}
+                {((data?.oracle_price / 1000000) * collateralBalance).toFixed(
+                  3
+                )}{" "}
+              </h3>
             </div>
             <div className="flex flex-row mx-[20px] justify-between mt-[20px]">
               <p>Liquidation price</p>
-              <h3>0.00</h3>
+              <h3>
+                $ {((1.29 * borrowBalance) / collateralBalance).toFixed(3)}
+              </h3>
             </div>
             <div className="flex flex-row mx-[20px] justify-between mt-[20px]">
               <p>Borrow Capacity</p>
-              <h3>0.00</h3>
+              <h3>
+                {" "}
+                ${" "}
+                {(
+                  ((data?.oracle_price / 1000000) * collateralBalance) / 1.29 -
+                  borrowBalance
+                ).toFixed(3)}{" "}
+              </h3>
             </div>
             <div className="flex flex-row mx-[20px] justify-between mt-[20px]">
               <p>LTV</p>
-              <h3>0.00</h3>
+              <h3>
+                {(
+                  (borrowBalance /
+                    ((data?.oracle_price / 1000000) * collateralBalance)) *
+                  100
+                ).toFixed(3)}{" "}
+                %
+              </h3>
             </div>
           </div>
         </div>
