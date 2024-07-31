@@ -18,7 +18,7 @@ const Join = () => {
     <div className="container py-12 lg:py-[125px] px-12 lg:px-[125px]">
       <div className="relative flex flex-col gap-5 rounded-[24px] bg-[#FFCF52] px-6 pb-[272px] pt-8 lg:h-[486px] lg:gap-6 lg:rounded-[32px] lg:px-[70px] lg:py-[109px]">
         <h3 className="z-10 text-[32px] font-medium leading-[38px] text-[#101010] lg:text-5xl lg:leading-[58px]">
-          Join Stable0x Ecosystem
+          Join StableOG Ecosystem
         </h3>
         <p className="z-10 pb-3 text-lg font-normal text-[#282828] lg:max-w-[415px] lg:pb-6 lg:text-xl lg:leading-[30px]">
           Tap into our liquidity contribution program tailored for blockchain

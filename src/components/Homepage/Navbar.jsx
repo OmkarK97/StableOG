@@ -8,14 +8,31 @@ const Navbar = ({ onScrollToInfo, onScrollToPartner }) => {
     <div className="relative">
       <div className="flex absolute w-full justify-evenly z-10 p-10">
         <div className="flex w-56 justify-between">
-          <img src={logo} className="w-10 h-10" />
-          <h1 className="text-4xl font-bold text-white font-josefin flex justify-center mt-1 cursor-pointer">
+          <img
+            src={logo}
+            className="w-10 h-10"
+            onClick={() => {
+              navigate("/");
+            }}
+          />
+          <h1
+            className="text-4xl font-bold text-white font-josefin flex justify-center mt-1 cursor-pointer"
+            onClick={() => {
+              navigate("/");
+            }}
+          >
             StableOG
           </h1>
         </div>
         <div className="border-2 w-72 h-10 border-gray-700/30 rounded-lg text-white">
           <div className="flex justify-between items-center px-7 h-full font-medium cursor-pointer">
-            <span>About us</span>
+            <span
+              onClick={() => {
+                navigate("/about");
+              }}
+            >
+              About us
+            </span>
             <span onClick={onScrollToInfo}>TL;DR</span>
             <span onClick={onScrollToPartner}>Partners</span>
           </div>

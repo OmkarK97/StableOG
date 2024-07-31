@@ -1,10 +1,13 @@
 import { motion, useAnimation, useInView } from "framer-motion";
 import React, { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Footer = () => {
   const controls = useAnimation();
   const ref = useRef();
   const inView = useInView(ref, { once: true });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (inView) {
@@ -34,8 +37,10 @@ const Footer = () => {
                 company
               </p>
               <a
-                className="text-base font-medium text-[#FFFFFF] transition-colors duration-300 ease-in-out hover:text-[#A0A0A0]"
-                href="/about"
+                className="text-base font-medium text-[#FFFFFF] transition-colors duration-300 ease-in-out hover:text-[#A0A0A0] cursor-pointer"
+                onClick={() => {
+                  navigate("/about");
+                }}
               >
                 About us
               </a>

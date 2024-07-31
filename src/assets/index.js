@@ -7,6 +7,7 @@ import infoLogo from './InfoLogo.webp';
 import susd from './SUSD.png';
 import susd_main from './SUSD_main.png';
 import om_token from './om_token.svg';
+import mantra from './mantra.svg';
 
 export {
     hero,
@@ -17,5 +18,6 @@ export {
     infoLogo,
     susd,
     susd_main,
-    om_token
+    om_token,
+    mantra
 }
