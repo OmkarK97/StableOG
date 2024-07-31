@@ -11,13 +11,9 @@ const Hero = () => {
       <h1 className="text-center text-[44px] font-medium leading-[52px] lg:text-6xl lg:leading-[86px] absolute top-[10%] left-[35%] animate-fadeInUp">
         Introducing SUSD,
       </h1>
-      <h1 className="text-center text-[44px] font-medium leading-[52px] lg:text-6xl lg:leading-[86px] absolute top-[14%] left-[25%] animate-fadeInUp">
-        The Cross-Chain Stablecoin
+      <h1 className="text-center text-[44px] font-medium leading-[52px] lg:text-6xl lg:leading-[86px] absolute top-[14%] left-[20%] animate-fadeInUp">
+        The Stablecoin backed by OM Token
       </h1>
-      <p className="px-5 pt-5 text-center text-lg font-normal leading-[27px] max-w-[508px] text-[#CFCFCF] absolute top-[20%] left-[35%] animate-fadeInUp">
-        A natively cross-chain and compliant yield-bearing stablecoin that
-        offers up to 5% APY* on collateral holdings.
-      </p>
       <div>
         <h2 className="text-center text-4xl font-medium leading-[44px] text-[#FFFFFF] lg:text-[64px] lg:leading-[76px] absolute bottom-[14%] left-[35%]">
           Horizontal Scaling
